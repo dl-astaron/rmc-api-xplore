@@ -1,10 +1,13 @@
 
 const formElems = {}
-const inputElemIds = ['spaceId', 'clientId']
+const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
-    'spaceId', 'startBtn', 'statusLine'
+    'spaceId', 'startBtn', 'statusLine',
+    'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
+
+const headerProps = ['UUID', 'Login', 'Status', 'Name', 'Group Count']
 
 function saveFormToUrlParams() {
     console.log('submitForm')
@@ -30,6 +33,7 @@ function main() {
     }
 
     formElems.startBtn.addEventListener('click', onStartClicked)
+    formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
 }
 
 function statusMsg(msg, props) {
@@ -68,16 +72,23 @@ async function onStartClicked() {
 
     console.log('Groups', groupsData)
 
+    let groups = groupsData?.items || []
+
     statusMsg('Fetching user details ... IN PROGRESS')
 
-    await fetchUserDetails(clientId, spaceId, userData, groupsData)
+    formElems.resultsHeader.appendChild( groupHeaderRow (groups, 'codeName', "code") )
+    formElems.resultsHeader.appendChild( headerRow (groups) )
+    formElems.copyTableBtn.style.visibility = 'visible'
+
+    await fetchUserDetails(clientId, spaceId, userData, groups)
 
     statusMsg('Fetching user details ... DONE')
 
 }
 
-async function fetchUserDetails(clientId, spaceId, userData, groupsData) {
+async function fetchUserDetails(clientId, spaceId, userData, groups) {
     let i = 0
+    let maxItems = parseInt(formElems?.maxItems?.value || 0)
     for (let u of (userData?.items || [])) {
         i += 1
         let url = `/rest/${clientId}/users/${u.uuid}`
@@ -87,11 +98,113 @@ async function fetchUserDetails(clientId, spaceId, userData, groupsData) {
 
         console.log('User Detail', userDetail)
 
-        if (i > 5)
+        formElems.resultsBody.appendChild(userRow(userDetail, spaceId, groups))
+
+        statusMsg(`Fetching user details ... IN PROGRESS  ${i}/${userData.items.length}`)
+
+
+        if (maxItems > 0 && i >= maxItems)
             break
     }
-
 }
+
+function groupHeaderRow(groups, propName, name) {
+    let headerRowElem = document.createElement('TR')
+
+    let headerGroupProps = new Array(headerProps.length - 1).fill('')
+
+    headerGroupProps.push(name)
+
+    for (let p of headerGroupProps) {
+        headerRowElem.appendChild(tableCell(p))
+    }
+    for (let g of groups) {
+        headerRowElem.appendChild(tableCell(g[propName]))
+    }
+    return headerRowElem
+}
+
+function headerRow(groups) {
+    let headerRowElem = document.createElement('TR')
+
+    for (let p of headerProps) {
+        headerRowElem.appendChild(tableCell(p, true))
+    }
+    for (let g of groups) {
+        headerRowElem.appendChild(tableCell(g.name, true))
+    }
+    return headerRowElem
+}
+
+function userRow(user, spaceId, groups) {
+    let userRowElem = document.createElement('TR')
+    let userProps = ['uuid', 'login', 'isActive','name']
+
+    for (let p of userProps) {
+        if (p === 'isActive') {
+            userRowElem.appendChild(tableCell(user[p] ? 'Active' : 'Inactive'))
+            continue
+        }
+        userRowElem.appendChild(tableCell(user[p]))
+    }
+
+    let userGroups = extractUserGroups(user, spaceId) || []
+    console.log('User Groups:', userGroups)
+
+    userRowElem.appendChild(tableCell(Object.keys(userGroups).length))
+
+    for (let g of groups) {
+        userRowElem.appendChild(tableCell(userGroups[g.uuid] ? "1" : '' ))
+    }
+
+    return userRowElem
+}
+
+function extractUserGroups(user, spaceId) {
+    let userSpaces = []
+    for (let rst of user.ringSpaceTypes) {
+        if (rst.name === 'Content Space') {
+            userSpaces = rst.ringSpaces
+            break
+        }
+    }
+    
+    let userGroups = []
+
+    for (let us of userSpaces) {
+        if (us.uuid === spaceId) {
+            userGroups = us.groups
+            break
+        }
+    }
+
+    let userGroupMap = {}
+    for (let g of userGroups) {
+        userGroupMap[g.uuid] = g
+    }
+
+    return userGroupMap
+}
+
+function tableCell(value, isHeader) {
+    let cell = document.createElement( isHeader ? 'TH' : 'TD' )
+    cell.innerText = value
+    return cell
+}
+
+async function onCopyTableClicked() {
+    let tableElem = formElems.resultsTable
+    let html = '<TABLE>'
+        + tableElem.innerHTML
+        + '</HTML>'
+
+    const blob = new Blob([html], {type: 'text/html'});
+    const clipboardItem = new window.ClipboardItem({ 'text/html': blob });
+
+    await navigator.clipboard.write([clipboardItem])
+    console.log('copied')
+}
+
 
 export { main }
 
