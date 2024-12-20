@@ -47,6 +47,7 @@ async function onStartClicked() {
     console.log('onStartClicked')
     
     saveFormToUrlParams()
+    clrTable()
     
     //RASP client e7f17ebe-51a8-4d6e-8dfe-7a92f627a428
     //fakt space a30bd446-9e79-4839-a7f8-7540bb4f5df4
@@ -84,6 +85,11 @@ async function onStartClicked() {
 
     statusMsg('Fetching user details ... DONE')
 
+}
+
+function clrTable() {
+    formElems.resultsHeader.innerHTML = ''
+    formElems.resultsBody.innerHTML = ''
 }
 
 async function fetchUserDetails(clientId, spaceId, userData, groups) {
