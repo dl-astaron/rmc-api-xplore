@@ -1,0 +1,54 @@
+<html>
+
+<head>
+  <title>User Analytics</title>
+  <script src="main.js" type="module"></script>
+  <style>
+    body {
+      font-family: helvetica, arial, system-ui;
+      max-width: 60em;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    label {
+      min-width: 6em;
+      display: inline-block;
+      font-size: small;
+    }
+    input {
+      font-family: monospace;
+      width: 24em;
+    }
+    .input-line {
+      margin: 0.3em;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div id="params">
+      <div class="input-line">
+        <label for="clientId">Client Id:</label>
+        <input id="clientId"></input>
+      </div>
+      <div class="input-line">
+        <label for="spaceId">Space Id:</label>
+        <input id="spaceId"></input>
+      </div>  
+      <div class="input-line">
+        <button id="startBtn">Start</button>
+      </div>
+    </div>
+    <div id="statusLine">
+      <span id="statusLine"></span>
+    </div>
+  </div>
+  <script type="module">
+    import { main } from './main.js'
+
+    main()
+
+  </script>
+</body>
+</html>
