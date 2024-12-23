@@ -111,7 +111,7 @@ async function onFetchGroupsClicked() {
 
     console.log('Groups', groupsData)
     
-    let headerNames = ['UUID', 'Name', 'Code', 'Description', 'cTime', 'mTime']
+    let headerNames = ['UUID', 'Name', 'Code', 'Member Count','Description', 'cTime', 'mTime']
 
     formElems.resultsHeader.appendChild( headerRow (headerNames) )
     formElems.copyTableBtn.style.visibility = 'visible'
@@ -188,12 +188,23 @@ function userGroupsHeaderRow(groups) {
     return headerRowElem
 }
 
+function isNullish(s) {
+    return s === null || s === undefined
+}
+
 function groupRow(group) {
     let groupRowElem = document.createElement('TR')
-    let groupProps = ['uuid', 'name', 'codeName', 'description', 'creationDate', 'modificationDate']
+    let groupProps = ['uuid', 'name', 'codeName', 'members.count', 'description', 'creationDate', 'modificationDate']
 
     for (let p of groupProps) {
-        groupRowElem.appendChild(tableCell(group[p]))
+        let cellValue = group[p]
+        if (p === 'members.count') 
+            cellValue = isNullish(group?.members?.count) ? '' : group.members.count
+
+        if (['creationDate', 'modificationDate'].includes(p))
+            cellValue = cellValue.substring(0, 19) + 'Z'
+
+        groupRowElem.appendChild(tableCell(cellValue))
     }
 
     return groupRowElem
