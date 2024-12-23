@@ -4,17 +4,20 @@
  * Module dependencies.
  */
 
+import { ServerConfig } from '../server/config.js';
 import { server as expressServer } from '../server.js'
 import debug from 'debug'
 import http from 'http';
 
 //var debug = require('debug')('express-app-tpl:server');
 
+ServerConfig.initialize()
+
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '4280');
+var port = normalizePort(ServerConfig.serverPort || process.env.PORT || '4280');
 expressServer.set('port', port);
 
 /**

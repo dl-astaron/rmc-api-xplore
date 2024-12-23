@@ -19,6 +19,4 @@ const currentDir = path.dirname(fileURLToPath(import.meta.url))
 server.use(express.static( path.join(currentDir, 'frontend') ));
 server.use('/rest', restRouter);
 
-ServerConfig.initialize()
-
 export { server }
