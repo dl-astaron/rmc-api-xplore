@@ -4,7 +4,7 @@ const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
     'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusLine',
-    'clientSelect',
+    'clientIdSelect', 'spaceIdSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
 
@@ -36,7 +36,8 @@ function main() {
     formElems.startBtn.addEventListener('click', onStartClicked)
     formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
     formElems.fetchGroupsBtn.addEventListener('click', onFetchGroupsClicked)
-    formElems.clientSelect.addEventListener('input', onClientSelected)
+    formElems.clientIdSelect.addEventListener('input', onClientSelected)
+    formElems.spaceIdSelect.addEventListener('input', onSpaceSelected)
 }
 
 function statusMsg(msg, props) {
@@ -44,10 +45,17 @@ function statusMsg(msg, props) {
 }
 
 function onClientSelected() {
-    console.log('onClientSelected', formElems.clientSelect.value)
-    let clientId = formElems.clientSelect.value
+    console.log('onClientSelected', formElems.clientIdSelect.value)
+    let clientId = formElems.clientIdSelect.value
     if (clientId)
         formElems.clientId.value = clientId
+}
+
+function onSpaceSelected() {
+    console.log('onSpaceSelected', formElems.spaceIdSelect.value)
+    let spaceId = formElems.spaceIdSelect.value
+    if (spaceId)
+        formElems.spaceId.value = spaceId
 }
 
 async function onStartClicked() {

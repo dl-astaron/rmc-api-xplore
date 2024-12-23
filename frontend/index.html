@@ -10,24 +10,30 @@
       margin-left: 3em;
       margin-right: 3em;
     }
+
     label {
       min-width: 6em;
       display: inline-block;
       font-size: small;
     }
+
     .separator {
       margin-left: 1em;
     }
+
     input {
       font-family: monospace;
       width: 24em;
     }
+
     .input-line {
       margin: 0.5em;
     }
+
     button:hover {
       background-color: #ddd;
     }
+
     button {
       height: 2em;
 
@@ -35,21 +41,26 @@
       border-right: 1px solid #bbb;
       border-bottom: 1px solid #bbb;
     }
+
     #copyTableBtn {
       margin-top: 0.5em;
       margin-bottom: 1em;
     }
+
     #maxItems {
       width: 3em;
     }
+
     table {
       border: 1px solid #ddd;
       border-collapse: collapse;
       width: 100%;
     }
+
     th {
       font-size: small;
     }
+
     td {
       padding: 0.2em;
       font-size: small;
@@ -64,13 +75,96 @@
       <div class="input-line">
         <label for="clientId">Client Id:</label>
         <input id="clientId"></input>
-        <select id="clientSelect">
+        <select id="clientIdSelect">
           <option value="">...</option>
           <option value="e7f17ebe-51a8-4d6e-8dfe-7a92f627a428">RASP</option>
         </select>
-        <span class="separator">  </span>
+        <span class="separator"> </span>
         <label for="spaceId">Space Id:</label>
         <input id="spaceId"></input>
+        <select id="spaceIdSelect">
+          <option value="">...</option>
+          <optgroup label="DEV">
+            <option value="954287a3-90b8-456e-a000-0bc702615415">Pulse2 Demo</option>
+            <option value="f81a7ed1-e26a-4b8d-9c1e-7f1e727ca8d4">Pulse2Sandbox</option>
+            <option value="5c4fc900-f32e-41e4-90e2-52e2012d1c22">ImagesPublicationTest</option>
+          </optgroup>
+          <optgroup label="Ring">
+            <option value="69c80701-b2bb-41cc-b723-96b760448274">Website</option>
+            <option value="f2436347-6f43-47ac-a7c6-656180fc9f93">Demo Site</option>
+          </optgroup>
+          <optgroup label="RASP">
+            <option value="a17e9bfd-e62d-4ed5-9041-0365fd2eefeb">Grupa Onet</option>
+            <option value="a30bd446-9e79-4839-a7f8-7540bb4f5df4">Fakt24</option>
+            <option value="1e873c0c-5982-4d48-9380-e8fd912c9929">PPO</option>
+            <option value="5e7a324a-2672-42a4-a66e-ad5d1b9604df">Forbes</option>
+            <option value="f05efb53-98ca-40b8-8d72-77cfb455a240">Noizz</option>
+            <option value="6bd88b42-bfe3-4fda-98cf-74ac09b9d852">Gaming Portals PL</option>
+            <option value="7f498836-2609-455e-b74e-41f9d2a01f83">Ofeminin</option>
+            <option value="73639542-eb02-4c7c-948d-af1b23da8723">Sympatia</option>
+            <option value="4c811500-bd56-447c-adf5-8334f4cedb3e">Business Insider</option>
+            <option value="006dcd15-b839-4dea-bf06-34584011c17f">Przegląd Sportowy</option>
+            <option value="fcb8ab38-2741-49e0-88ce-bbd19ccbe235">Motoryzacja</option>
+            <option value="55c8b493-4ab9-4861-a8b2-dd4fc1c29e84">Newsweek (NW)</option>
+            <option value="65012872-aead-4fac-8bf0-69601c32a92f">Technologie</option>
+            <option value="7668ad8b-6256-42f7-98d0-670e6e4a770d">Gotowanie</option>
+            <option value="3cf0b1cb-232e-44ee-adf7-6598ef4aef58">Medonet</option>
+            <option value="24b52669-60c4-442e-ace1-2612a6f9314d">Medonet Żywienie</option>
+            <option value="c388b1be-850b-40ee-9a4e-fc670dc6f414">Medonet Uroda</option>
+            <option value="5bb4f690-e304-4989-8204-e00f5510ec4a">Medonet Dziecko</option>
+            <option value="8c0f3187-c820-4199-958c-017445880cd4">Kontynenty</option>
+            <option value="2868ba6a-70d5-458d-aae8-1e327904aca3">Onet Magia</option>
+            <option value="1e8466c5-7c13-4830-996a-f130849bd4ad">Lamoda Blog</option>
+            <option value="77220628-2cb6-4146-98b5-f511324b9fd7">Video</option>
+            <option value="a299e8ab-7465-487f-85a8-9a85c618d126">Disco for ecommerce</option>
+            <option value="e39270e6-0afb-472f-9490-13332124320a">Skąpiec</option>
+            <option value="993d27cc-02c4-4287-abd6-d6cd58e15646">OMP INT</option>
+          </optgroup>
+          <optgroup label="INFOR">
+            <option value="50a12ee2-5440-4c99-a913-35429916a05e">Dziennik</option>
+            <option value="05dec3b8-a44b-4dd0-a4d2-4f7c4d66473d">Forsal</option>
+            <option value="cbf031a0-775d-4eca-89b0-6440506aa10a">Gazeta Prawna</option>
+          </optgroup>
+          <option value="4b59a821-8f26-4179-9dfa-6ad037f2be5e">POLITICO / Production</option>
+          <optgroup label="RASHU">
+            <option value="33209adb-06cb-4da6-ad67-02a912f5eacb">NoizzHU</option>
+            <option value="5e3ce512-d973-455b-b2ff-708c1f140308">Blikk.hu</option>
+            <option value="08dbaa1c-0a51-4ea8-a421-6e76eb507c5c">Egeszsegkalauz</option>
+            <option value="770ea27f-8c64-48e3-9be4-94ca4dd66d0a">Glamour HU</option>
+            <option value="12401a82-3902-4154-a8a7-02ca2c02a0f3">Kiskegyed</option>
+            <option value="6fe08a3f-f56b-489b-927f-f3b2f44acbdd">Recepttar</option>
+          </optgroup>
+          <optgroup label="RASRS">
+            <option value="4a817215-5207-47bf-95e1-5b8701c33f17">Blic</option>
+            <option value="61b243eb-697b-4602-a5e3-2b21d6826596">Puls Online</option>
+            <option value="a7da9d8d-0dff-4962-a982-a6f7d4fe6580">Zena</option>
+            <option value="2c72577d-1c82-42ac-badc-5ebd8e51501c">Noizz.rs</option>
+          </optgroup>
+          <optgroup label="RASSK">
+            <option value="d7e0c8b6-8361-4084-9758-6651fa9a362c">RAS SK</option>
+            <option value="808ad900-1c5c-4062-aa6e-8aab5b2e8659">Azet</option>
+            <option value="7cc26272-cdf9-44b8-930c-07e12094eff1">NoizzAzetSk</option>
+          </optgroup>
+          <optgroup label="HEISE">
+            <option value="96df5ccd-4f86-42db-8910-8bc5d4184ee0">Techstage</option>
+            <option value="424278f9-aa24-4414-9791-95771b7065e8">Guenstiger</option>
+            <option value="3e8e6e20-5351-4803-8b08-563ec26a2919">Guenstiger Content</option>
+            <option value="40d69ac6-1575-4988-b977-81dfcba8e474">Tarifrechner</option>
+          </optgroup>
+          <optgroup label="RADP">
+            <option value="7dd277c7-e647-489d-a0cd-8c305073a877">RADP / RADP</option>
+            <option value="94814ec6-2d53-4193-9417-58eafa3fc2e5">RADP / Sportal Stage</option>
+          </optgroup>
+          <optgroup label="RADP">
+            <option value="0312f2d2-aaa6-4b64-8086-1f3dfc1fdbf5">Libertatea RO</option>
+            <option value="5f64a093-de56-46d0-91fa-162f13e84af1">Unica RO</option>
+          </optgroup>
+          <optgroup label="DEMO">
+            <option value="274b2f22-bb5d-4312-a2c4-18a775aaa5f8">DEMO A</option>
+            <option value="e7eeaf29-abb1-46fe-92c2-38ed030f0fdb">DEMO D</option>
+            <option value="89cb0eef-e4c0-4e1f-855a-a3abd39d11a8">DEMO C</option>
+          </optgroup>
+        </select>
       </div>
       <div class="input-line">
         <button id="fetchGroupsBtn">Fetch Groups</button>
@@ -83,16 +177,16 @@
     <div id="statusLine">
       <span id="statusLine"></span>
     </div>
-  <div id="results">
-    <hr>
-    <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
-    <table id="resultsTable">
-      <thead id="resultsHeader">
-      </thead>
-      <tbody id="resultsBody">
-      </tbody>
-    </table>
-  </div>
+    <div id="results">
+      <hr>
+      <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
+      <table id="resultsTable">
+        <thead id="resultsHeader">
+        </thead>
+        <tbody id="resultsBody">
+        </tbody>
+      </table>
+    </div>
   </div>
   <script type="module">
     import { main } from './main.js'
@@ -101,4 +195,5 @@
 
   </script>
 </body>
+
 </html>
