@@ -4,6 +4,7 @@ const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
     'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusLine',
+    'clientSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
 
@@ -35,10 +36,18 @@ function main() {
     formElems.startBtn.addEventListener('click', onStartClicked)
     formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
     formElems.fetchGroupsBtn.addEventListener('click', onFetchGroupsClicked)
+    formElems.clientSelect.addEventListener('input', onClientSelected)
 }
 
 function statusMsg(msg, props) {
     formElems.statusLine.innerText = msg
+}
+
+function onClientSelected() {
+    console.log('onClientSelected', formElems.clientSelect.value)
+    let clientId = formElems.clientSelect.value
+    if (clientId)
+        formElems.clientId.value = clientId
 }
 
 async function onStartClicked() {

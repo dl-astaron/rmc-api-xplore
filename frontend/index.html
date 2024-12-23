@@ -15,12 +15,25 @@
       display: inline-block;
       font-size: small;
     }
+    .separator {
+      margin-left: 1em;
+    }
     input {
       font-family: monospace;
       width: 24em;
     }
     .input-line {
       margin: 0.5em;
+    }
+    button:hover {
+      background-color: #ddd;
+    }
+    button {
+      height: 2em;
+
+      border: 0px;
+      border-right: 1px solid #bbb;
+      border-bottom: 1px solid #bbb;
     }
     #copyTableBtn {
       margin-top: 0.5em;
@@ -51,17 +64,21 @@
       <div class="input-line">
         <label for="clientId">Client Id:</label>
         <input id="clientId"></input>
+        <select id="clientSelect">
+          <option value="">...</option>
+          <option value="e7f17ebe-51a8-4d6e-8dfe-7a92f627a428">RASP</option>
+        </select>
+        <span class="separator">  </span>
         <label for="spaceId">Space Id:</label>
         <input id="spaceId"></input>
       </div>
       <div class="input-line">
-        <button id="startBtn">Fetch User Groups</button>
-        <label for="maxItems">Max Item Limit:</label>
-        <input id="maxItems"></input>
-      </div>
-      <div class="input-line">
         <button id="fetchGroupsBtn">Fetch Groups</button>
-      </div>  
+        <button id="startBtn">Fetch User Groups (
+          <label for="maxItems">Max Item Limit:</label>
+          <input id="maxItems"></input> )
+        </button>
+      </div>
     </div>
     <div id="statusLine">
       <span id="statusLine"></span>
