@@ -3,7 +3,7 @@ const formElems = {}
 const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
-    'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusLine',
+    'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusMsgLine',
     'clientIdSelect', 'spaceIdSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
@@ -41,7 +41,7 @@ function main() {
 }
 
 function statusMsg(msg, props) {
-    formElems.statusLine.innerText = msg
+    formElems.statusMsgLine.innerText = msg
 }
 
 function onClientSelected() {

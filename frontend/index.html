@@ -17,6 +17,13 @@
       font-size: small;
     }
 
+    #statusLine {
+      border-bottom: 1px solid #ddd;
+      padding: 0.2em;
+      font-family: monospace;
+      font-size: small;
+    }
+
     .separator {
       margin-left: 1em;
     }
@@ -175,10 +182,9 @@
       </div>
     </div>
     <div id="statusLine">
-      <span id="statusLine"></span>
+      <span id="statusMsgLine"></span>
     </div>
     <div id="results">
-      <hr>
       <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
       <table id="resultsTable">
         <thead id="resultsHeader">
