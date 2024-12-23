@@ -28,7 +28,7 @@ function readJsonFile (filePath) {
         returnObj.filePath = filePath
     }
 
-    console.log('Reading file:', returnObj.filePath)
+    //console.log('Reading file:', returnObj.filePath)
 
     if (! fs.existsSync( returnObj.filePath )) {
         returnObj.status = 'ENOENT'
