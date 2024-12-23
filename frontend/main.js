@@ -3,7 +3,7 @@ const formElems = {}
 const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
-    'spaceId', 'startBtn', 'statusLine',
+    'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusLine',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
 
@@ -34,6 +34,7 @@ function main() {
 
     formElems.startBtn.addEventListener('click', onStartClicked)
     formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
+    formElems.fetchGroupsBtn.addEventListener('click', onFetchGroupsClicked)
 }
 
 function statusMsg(msg, props) {
@@ -78,7 +79,7 @@ async function onStartClicked() {
     statusMsg('Fetching user details ... IN PROGRESS')
 
     formElems.resultsHeader.appendChild( groupHeaderRow (groups, 'codeName', "code") )
-    formElems.resultsHeader.appendChild( headerRow (groups) )
+    formElems.resultsHeader.appendChild( userGroupsHeaderRow (groups) )
     formElems.copyTableBtn.style.visibility = 'visible'
 
     await fetchUserDetails(clientId, spaceId, userData, groups)
@@ -87,6 +88,42 @@ async function onStartClicked() {
 
 }
 
+async function onFetchGroupsClicked() {
+    const spaceId = formElems.spaceId.value
+    const clientId = formElems.clientId.value
+
+    console.log('onStartClicked')
+    
+    saveFormToUrlParams()
+    clrTable()
+
+    let usp = new URLSearchParams()
+    usp.set('space', spaceId)
+
+    statusMsg('Fetching groups ...')
+
+    let url = `/rest/${clientId}/groups` + '?' + usp.toString()
+
+    let groupsResp = await fetch(url)
+    let groupsData = await groupsResp.json()
+
+    statusMsg('Fetching groups DONE.')
+
+    console.log('Groups', groupsData)
+    
+    let headerNames = ['UUID', 'Name', 'Code', 'Description', 'cTime', 'mTime']
+
+    formElems.resultsHeader.appendChild( headerRow (headerNames) )
+    formElems.copyTableBtn.style.visibility = 'visible'
+
+    let i = 0
+    for (let g of groupsData.items) {
+        i += 1
+        
+        formElems.resultsBody.appendChild(groupRow(g))
+    }
+
+}
 function clrTable() {
     formElems.resultsHeader.innerHTML = ''
     formElems.resultsBody.innerHTML = ''
@@ -130,7 +167,16 @@ function groupHeaderRow(groups, propName, name) {
     return headerRowElem
 }
 
-function headerRow(groups) {
+function headerRow(names) {
+    let headerRowElem = document.createElement('TR')
+
+    for (let n of names) {
+        headerRowElem.appendChild(tableCell(n, true))
+    }
+    return headerRowElem
+}
+
+function userGroupsHeaderRow(groups) {
     let headerRowElem = document.createElement('TR')
 
     for (let p of headerProps) {
@@ -140,6 +186,17 @@ function headerRow(groups) {
         headerRowElem.appendChild(tableCell(g.name, true))
     }
     return headerRowElem
+}
+
+function groupRow(group) {
+    let groupRowElem = document.createElement('TR')
+    let groupProps = ['uuid', 'name', 'codeName', 'description', 'creationDate', 'modificationDate']
+
+    for (let p of groupProps) {
+        groupRowElem.appendChild(tableCell(group[p]))
+    }
+
+    return groupRowElem
 }
 
 function userRow(user, spaceId, groups) {

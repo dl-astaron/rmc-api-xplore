@@ -20,7 +20,27 @@
       width: 24em;
     }
     .input-line {
-      margin: 0.3em;
+      margin: 0.5em;
+    }
+    #copyTableBtn {
+      margin-top: 0.5em;
+      margin-bottom: 1em;
+    }
+    #maxItems {
+      width: 3em;
+    }
+    table {
+      border: 1px solid #ddd;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th {
+      font-size: small;
+    }
+    td {
+      padding: 0.2em;
+      font-size: small;
+      border: 1px solid #ddd;
     }
   </style>
 </head>
@@ -31,22 +51,24 @@
       <div class="input-line">
         <label for="clientId">Client Id:</label>
         <input id="clientId"></input>
-      </div>
-      <div class="input-line">
         <label for="spaceId">Space Id:</label>
         <input id="spaceId"></input>
-      </div>  
+      </div>
       <div class="input-line">
-        <button id="startBtn">Start</button>
+        <button id="startBtn">Fetch User Groups</button>
         <label for="maxItems">Max Item Limit:</label>
         <input id="maxItems"></input>
       </div>
+      <div class="input-line">
+        <button id="fetchGroupsBtn">Fetch Groups</button>
+      </div>  
     </div>
     <div id="statusLine">
       <span id="statusLine"></span>
     </div>
   <div id="results">
-    <button id=copyTableBtn style="visibility: hidden;">Copy Table</button>
+    <hr>
+    <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
     <table id="resultsTable">
       <thead id="resultsHeader">
       </thead>
