@@ -7,6 +7,7 @@ const restRouter = express.Router();
 restRouter.get('/:clientId/users/', userList );
 restRouter.get('/:clientId/users/:userId', userGet );
 restRouter.get('/:clientId/groups/', groupList );
+restRouter.get('/:clientId/brands/', brandList );
 
 
 /*
@@ -72,6 +73,26 @@ async function userGet(req, res, next) {
     res.send( JSON.stringify( user ));
 }
 
+/**
+ * https://management-api.console.ringpublishing.com/ring-clients/{ringClientId}/brands
+ * 
+ * Get list of brands
+ * 
+ * Eg: http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/brands
+ */
+async function brandList(req, res, next) {
+
+    let ringClientId = req.params.clientId 
+    
+    let rmcApi = new RmcApi(ringClientId)
+
+
+    const brands = await rmcApi.get(`ring-clients/${ringClientId}/brands`, {  })
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( brands ));
+}
 
 
 export { restRouter }

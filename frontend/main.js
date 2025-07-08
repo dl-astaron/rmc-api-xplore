@@ -3,7 +3,8 @@ const formElems = {}
 const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
-    'spaceId', 'startBtn', 'fetchGroupsBtn', 'statusMsgLine',
+    'spaceId', 'startBtn', 'fetchGroupsBtn', 'fetchBrands',
+    'statusMsgLine',
     'clientIdSelect', 'spaceIdSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
@@ -36,6 +37,7 @@ function main() {
     formElems.startBtn.addEventListener('click', onStartClicked)
     formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
     formElems.fetchGroupsBtn.addEventListener('click', onFetchGroupsClicked)
+    formElems.fetchBrands.addEventListener('click', onFetchBrandsClicked)
     formElems.clientIdSelect.addEventListener('input', onClientSelected)
     formElems.spaceIdSelect.addEventListener('input', onSpaceSelected)
 }
@@ -109,7 +111,7 @@ async function onFetchGroupsClicked() {
     const spaceId = formElems.spaceId.value
     const clientId = formElems.clientId.value
 
-    console.log('onStartClicked')
+    console.log('onFetchGroupsClicked')
     
     saveFormToUrlParams()
     clrTable()
@@ -141,6 +143,41 @@ async function onFetchGroupsClicked() {
     }
 
 }
+
+async function onFetchBrandsClicked() {
+    const spaceId = formElems.spaceId.value
+    const clientId = formElems.clientId.value
+
+    console.log('onFetchGroupsClicked')
+
+    clrTable()
+    saveFormToUrlParams()
+
+    statusMsg('Fetching brands ...')
+
+    let url = `/rest/${clientId}/brands`
+
+    const brandsResp = await fetch(url)
+    const brandsData = await brandsResp.json()
+
+    statusMsg('Fetching groups DONE.')
+
+    console.log('Brands', brandsData)
+
+    let headerNames = ['UUID', 'Name', 'Short Name','Description', 'cTime', 'mTime', 'Creator']
+
+    formElems.resultsHeader.appendChild( headerRow (headerNames) )
+    formElems.copyTableBtn.style.visibility = 'visible'
+
+    let i = 0
+    for (let b of brandsData.items) {
+        i += 1
+        
+        formElems.resultsBody.appendChild(brandRow(b))
+    }
+
+}
+
 function clrTable() {
     formElems.resultsHeader.innerHTML = ''
     formElems.resultsBody.innerHTML = ''
@@ -249,6 +286,21 @@ function userRow(user, spaceId, groups) {
     }
 
     return userRowElem
+}
+
+function brandRow(brand) {
+    let brandRowElem = document.createElement('TR')
+    let props = ['uuid', 'name', 'shortName','description', 'creationDate', 'modificationDate', 'author']
+
+    for (let p of props) {
+        let cellValue = brand[p]
+        if (['creationDate', 'modificationDate'].includes(p))
+            cellValue = cellValue.substring(0, 19) + 'Z'
+
+        brandRowElem.appendChild(tableCell(cellValue))
+    }
+
+    return brandRowElem
 }
 
 function extractUserGroups(user, spaceId) {
