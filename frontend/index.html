@@ -73,6 +73,16 @@
       font-size: small;
       border: 1px solid #ddd;
     }
+
+    td.uuid-editable {
+      cursor: default;
+    }
+    td.uuid-editable:hover {
+      background-color: lightgray;
+    }
+    td.uuid-editable::after {
+      content: ' ✏️';
+    }
   </style>
 </head>
 
@@ -202,7 +212,7 @@
     <div id="statusLine">
       <span id="statusMsgLine"></span>
     </div>
-    <div id="results">
+    <div id="resultsPanel">
       <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
       <table id="resultsTable">
         <thead id="resultsHeader">
@@ -210,6 +220,18 @@
         <tbody id="resultsBody">
         </tbody>
       </table>
+    </div>
+    <div id="editorPanel" style="display: none;">
+      <div class="input-line">
+        <label for="objectId"><span id=objectType></span> Id:</label>
+        <input id="objectId"></input>
+      </div>
+      <textarea id="editorText" rows="10" cols="80"></textarea>
+      <div class="input-line">
+        <button id="updateBtn"> Update </button>
+        <button id="createBtn"> Create New</button>
+        <span id="editorStatus"></span>
+      </div>
     </div>
   </div>
   <script type="module">

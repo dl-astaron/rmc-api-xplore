@@ -1,34 +1,60 @@
 
 const formElems = {}
-const inputElemIds = ['spaceId', 'clientId', 'maxItems']
+const inputElemIds = ['spaceId', 'clientId', 'maxItems', 'objectId', 'editorText']
 const elemIds = [
     ... inputElemIds,
     'spaceId', 'startBtn', 'fetchGroupsBtn', 'fetchBrands', 'fetchPubTitles',
-    'statusMsgLine',
+    'statusMsgLine', 'objectType',
     'clientIdSelect', 'spaceIdSelect', 'brandsSelect',
-    'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
+    'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn',
+    'resultsPanel', 'editorPanel',
 ]
 
 const headerProps = ['UUID', 'Login', 'Status', 'Name', 'Group Count']
 
-const tableConfig = {
+const TypesConfig = {
     User : {
         headerNames: ['UUID', 'Login', 'Status', 'Name', 'Group Count'],
         rowProps: ['uuid', 'login', 'isActive', 'name', 'groups.count']
     },
+    Group: {
+        headerNames: ['UUID', 'Name', 'Code', 'Member Count','Description', 'cTime', 'mTime'],
+        rowProps: ['uuid', 'name', 'codeName', 'members.count', 'description', 'creationDate', 'modificationDate']
+    },
     Brand: {
         headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator'],
-        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author']
+        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author'],
+        editableProps: ['name', 'shortName', 'description'],
+        editable: true,
+        restPath: 'brands',
     },
     PublicationTitle : {
         headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator', 'Is Active'],
-        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author', 'isActive']
+        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author', 'isActive'],
+        editableProps: ['name', 'shortName', 'description', 'publicationChannel', 'isActive', 'accountingIdentifier'],
+        editable: true,
+        restPath: 'pub-titles',
     }
 }
 
 const getTableConfig = (type) => {
-    return tableConfig[type] || null
+    return TypesConfig[type] || null
 }
+
+function showPanel(panelId) {
+    console.log('showPanel', panelId)
+
+    const panels = ['resultsPanel', 'editorPanel']
+
+    for (let p of panels) {
+        if (p === panelId) {
+            formElems[p].style.display = 'block'
+        } else {
+            formElems[p].style.display = 'none'
+        }
+    }
+}
+
 
 function saveFormToUrlParams() {
     console.log('submitForm')
@@ -96,6 +122,7 @@ async function onStartClicked() {
 
     console.log('onStartClicked')
     
+    showPanel('resultsPanel')
     saveFormToUrlParams()
     clrTable()
     
@@ -143,6 +170,8 @@ async function onFetchGroupsClicked() {
 
     console.log('onFetchGroupsClicked')
     
+    showPanel('resultsPanel')
+
     saveFormToUrlParams()
     clrTable()
 
@@ -160,18 +189,7 @@ async function onFetchGroupsClicked() {
 
     console.log('Groups', groupsData)
     
-    let headerNames = ['UUID', 'Name', 'Code', 'Member Count','Description', 'cTime', 'mTime']
-
-    formElems.resultsHeader.appendChild( headerRow (headerNames) )
-    formElems.copyTableBtn.style.visibility = 'visible'
-
-    let i = 0
-    for (let g of groupsData.items) {
-        i += 1
-        
-        formElems.resultsBody.appendChild(groupRow(g))
-    }
-
+    showResultsTable('Group', groupsData.items)
 }
 
 async function onFetchBrandsClicked() {
@@ -179,6 +197,7 @@ async function onFetchBrandsClicked() {
 
     console.log('onFetchGroupsClicked')
 
+    showPanel('resultsPanel')
     clrTable()
     saveFormToUrlParams()
 
@@ -210,6 +229,7 @@ async function onFetchPubTitlesClicked() {
     let usp = new URLSearchParams()
     usp.set('brandId', brandId)
 
+    showPanel('resultsPanel')
     clrTable()
     saveFormToUrlParams()
 
@@ -266,7 +286,6 @@ function populateBandsSelect(brands) {
     }
     formElems.brandsSelect.innerHTML = options.join('\n')
 }
-
 
 async function fetchUserDetails(clientId, spaceId, userData, groups) {
     let i = 0
@@ -331,24 +350,6 @@ function isNullish(s) {
     return s === null || s === undefined
 }
 
-function groupRow(group) {
-    let groupRowElem = document.createElement('TR')
-    let groupProps = ['uuid', 'name', 'codeName', 'members.count', 'description', 'creationDate', 'modificationDate']
-
-    for (let p of groupProps) {
-        let cellValue = group[p]
-        if (p === 'members.count') 
-            cellValue = isNullish(group?.members?.count) ? '' : group.members.count
-
-        if (['creationDate', 'modificationDate'].includes(p))
-            cellValue = cellValue.substring(0, 19) + 'Z'
-
-        groupRowElem.appendChild(tableCell(cellValue))
-    }
-
-    return groupRowElem
-}
-
 function userRow(user, spaceId, groups) {
     let userRowElem = document.createElement('TR')
     let userProps = ['uuid', 'login', 'isActive','name']
@@ -388,11 +389,64 @@ function createRowElem(rowType, rowItem) {
             cellValue = cellValue.substring(0, 19) + 'Z'
         if (p === 'isActive')
             cellValue = rowItem[p] ? 'Active' : 'Inactive'
+        if (p === 'members.count') 
+            cellValue = isNullish(rowItem?.members?.count) ? '' : rowItem.members.count
 
-        rowElem.appendChild(tableCell(cellValue))
+        const cell = tableCell(cellValue)
+
+        if (tableConfig.editable && p === 'uuid') {
+            cell.classList.add('uuid-editable')
+            cell.addEventListener('click', () => { editObject(rowType, rowItem.uuid) })
+        }
+        rowElem.appendChild(cell)
     }
 
     return rowElem
+}
+
+const editObject = async (rowType, objectId) => {
+    const restPathMap = {
+        Brand: 'brands',
+        PublicationTitle: 'pub-titles',
+    }
+    const restPath = TypesConfig[rowType]?.restPath || null
+    const editableProps = TypesConfig[rowType]?.editableProps || null
+    if (!restPath) {
+        console.error(`No REST path defined for row type: ${rowType}`)
+        return
+    }
+
+    const clientId = formElems.clientId.value
+
+    console.log(`Editing ${rowType} with ID: ${objectId}`)
+
+    showPanel('editorPanel')
+
+    formElems.objectId.value = objectId
+    formElems.objectType.innerText = rowType
+
+    statusMsg(`Fetching ${rowType} with ID: ${objectId}`)
+
+    let url = `/rest/${clientId}/${restPath}/${objectId}`
+
+    const fetchResp = await fetch(url)
+    const respData = await fetchResp.json()
+
+    console.log(`${rowType} Data`, respData)
+
+    let editableData = {}
+
+    for (let p of editableProps) {
+        if (! respData.hasOwnProperty(p))
+            continue
+        editableData[p] = respData[p]
+    }
+
+    const jsonData = JSON.stringify(editableData, null, 2)
+
+    formElems.editorText.value = jsonData
+
+    statusMsg(`Fetching ${rowType} with ID: ${objectId} DONE`)
 }
 
 function extractUserGroups(user, spaceId) {
