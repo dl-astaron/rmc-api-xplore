@@ -3,13 +3,32 @@ const formElems = {}
 const inputElemIds = ['spaceId', 'clientId', 'maxItems']
 const elemIds = [
     ... inputElemIds,
-    'spaceId', 'startBtn', 'fetchGroupsBtn', 'fetchBrands',
+    'spaceId', 'startBtn', 'fetchGroupsBtn', 'fetchBrands', 'fetchPubTitles',
     'statusMsgLine',
-    'clientIdSelect', 'spaceIdSelect',
+    'clientIdSelect', 'spaceIdSelect', 'brandsSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn'
 ]
 
 const headerProps = ['UUID', 'Login', 'Status', 'Name', 'Group Count']
+
+const tableConfig = {
+    User : {
+        headerNames: ['UUID', 'Login', 'Status', 'Name', 'Group Count'],
+        rowProps: ['uuid', 'login', 'isActive', 'name', 'groups.count']
+    },
+    Brand: {
+        headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator'],
+        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author']
+    },
+    PublicationTitle : {
+        headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator', 'Is Active'],
+        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author', 'isActive']
+    }
+}
+
+const getTableConfig = (type) => {
+    return tableConfig[type] || null
+}
 
 function saveFormToUrlParams() {
     console.log('submitForm')
@@ -38,8 +57,11 @@ function main() {
     formElems.copyTableBtn.addEventListener('click', onCopyTableClicked)
     formElems.fetchGroupsBtn.addEventListener('click', onFetchGroupsClicked)
     formElems.fetchBrands.addEventListener('click', onFetchBrandsClicked)
+    formElems.fetchPubTitles.addEventListener('click', onFetchPubTitlesClicked)
     formElems.clientIdSelect.addEventListener('input', onClientSelected)
     formElems.spaceIdSelect.addEventListener('input', onSpaceSelected)
+    formElems.brandsSelect.addEventListener('input', onBrandSelected)
+
 }
 
 function statusMsg(msg, props) {
@@ -58,6 +80,14 @@ function onSpaceSelected() {
     let spaceId = formElems.spaceIdSelect.value
     if (spaceId)
         formElems.spaceId.value = spaceId
+}
+
+function onBrandSelected() {
+    console.log('onBrandSelected', formElems.brandsSelect.value)
+    let brandId = formElems.brandsSelect.value
+
+    formElems.fetchPubTitles.disabled = brandId ? false : true
+
 }
 
 async function onStartClicked() {
@@ -145,7 +175,6 @@ async function onFetchGroupsClicked() {
 }
 
 async function onFetchBrandsClicked() {
-    const spaceId = formElems.spaceId.value
     const clientId = formElems.clientId.value
 
     console.log('onFetchGroupsClicked')
@@ -164,24 +193,80 @@ async function onFetchBrandsClicked() {
 
     console.log('Brands', brandsData)
 
-    let headerNames = ['UUID', 'Name', 'Short Name','Description', 'cTime', 'mTime', 'Creator']
+    showResultsTable('Brand', brandsData.items)
 
-    formElems.resultsHeader.appendChild( headerRow (headerNames) )
-    formElems.copyTableBtn.style.visibility = 'visible'
+    populateBandsSelect(brandsData.items)
+}
 
-    let i = 0
-    for (let b of brandsData.items) {
-        i += 1
-        
-        formElems.resultsBody.appendChild(brandRow(b))
-    }
+async function onFetchPubTitlesClicked() {
+    const brandId = formElems.brandsSelect.value
+    const clientId = formElems.clientId.value
 
+    console.log('onFetchPubTitlesClicked', brandId)
+
+    if (!brandId) 
+        return
+
+    let usp = new URLSearchParams()
+    usp.set('brandId', brandId)
+
+    clrTable()
+    saveFormToUrlParams()
+
+    statusMsg('Fetching pub titles ...')
+
+    let url = `/rest/${clientId}/pub-titles` + '?' + usp.toString()
+
+    const fetchResp = await fetch(url)
+    const respData = await fetchResp.json()
+
+    statusMsg('Fetching pub titles DONE.')
+
+    console.log('Publ Titles', respData)
+
+    showResultsTable('PublicationTitle', respData.items)
 }
 
 function clrTable() {
     formElems.resultsHeader.innerHTML = ''
     formElems.resultsBody.innerHTML = ''
 }
+
+function showResultsTable(objectType, dataItems) {
+    clrTable()
+
+    const tableConfig = getTableConfig(objectType)
+    if (!tableConfig) {
+        console.error(`No table config found for ${objectType}`)
+        return
+    }
+
+    formElems.resultsHeader.appendChild( headerRow ( tableConfig.headerNames ) )
+    formElems.copyTableBtn.style.visibility = 'visible'
+
+    let i = 0
+    for (let item of dataItems) {
+        i += 1
+        
+        formElems.resultsBody.appendChild(createRowElem(objectType, item))
+    }
+}
+
+
+function populateBandsSelect(brands) {
+    if (!brands) return
+
+    let options = [
+        `<option value=""> --- No Brand Selected (${brands.length} item[s]) ---</option>`
+    ]
+    for (let b of brands) {
+        options.push(
+            `<option value="${b.uuid}">${b.name} (${b.shortName})</option>`
+        )
+    }
+    formElems.brandsSelect.innerHTML = options.join('\n')
+}
+
 
 async function fetchUserDetails(clientId, spaceId, userData, groups) {
     let i = 0
@@ -288,19 +373,26 @@ function userRow(user, spaceId, groups) {
     return userRowElem
 }
 
-function brandRow(brand) {
-    let brandRowElem = document.createElement('TR')
-    let props = ['uuid', 'name', 'shortName','description', 'creationDate', 'modificationDate', 'author']
-
-    for (let p of props) {
-        let cellValue = brand[p]
-        if (['creationDate', 'modificationDate'].includes(p))
-            cellValue = cellValue.substring(0, 19) + 'Z'
-
-        brandRowElem.appendChild(tableCell(cellValue))
+function createRowElem(rowType, rowItem) {
+    const tableConfig = getTableConfig(rowType)
+    if (!tableConfig) {
+        console.error(`No table config found for row type: ${rowType}`)
+        return null
     }
 
-    return brandRowElem
+    let rowElem = document.createElement('TR')
+    let props = tableConfig.rowProps
+    for (let p of props) {
+        let cellValue = rowItem[p]
+        if (['creationDate', 'modificationDate'].includes(p))
+            cellValue = cellValue.substring(0, 19) + 'Z'
+        if (p === 'isActive')
+            cellValue = rowItem[p] ? 'Active' : 'Inactive'
+
+        rowElem.appendChild(tableCell(cellValue))
+    }
+
+    return rowElem
 }
 
 function extractUserGroups(user, spaceId) {

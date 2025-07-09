@@ -8,7 +8,7 @@ restRouter.get('/:clientId/users/', userList );
 restRouter.get('/:clientId/users/:userId', userGet );
 restRouter.get('/:clientId/groups/', groupList );
 restRouter.get('/:clientId/brands/', brandList );
-
+restRouter.get('/:clientId/pub-titles/', pubTitleList );
 
 /*
     * Get list of users
@@ -94,6 +94,27 @@ async function brandList(req, res, next) {
     await res.send( JSON.stringify( brands ));
 }
 
+
+/**
+ * https://management-api.console.ringpublishing.com/brands/{brandId}/publishing-titles
+ * 
+ * Get list of brands
+ * 
+ * Eg: http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/pub-titles?brandId=...
+ */
+async function pubTitleList(req, res, next) {
+
+    let ringClientId = req.params.clientId
+    let brandId = req.query.brandId
+
+    let rmcApi = new RmcApi(ringClientId)
+
+    const pubTitles = await rmcApi.get(`brands/${brandId}/publishing-titles`, {  })
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( pubTitles ));
+}
 
 export { restRouter }
 
