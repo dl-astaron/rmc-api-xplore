@@ -41,12 +41,24 @@
       background-color: #ddd;
     }
 
+    button:active {
+      background-color: #ccc;
+      border-left: 1px solid #bbb;
+      border-top: 1px solid #bbb;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      
+    }
+
     button {
       height: 2em;
 
       border: 0px;
       border-right: 1px solid #bbb;
       border-bottom: 1px solid #bbb;
+      border-left: 1px solid #fff;
+      border-top: 1px solid #fff;
+      border-radius: 5px;
     }
 
     #copyTableBtn {
@@ -214,6 +226,7 @@
     </div>
     <div id="resultsPanel">
       <button id=copyTableBtn style="visibility: hidden;">📋 Copy Table to Clipboard</button>
+      <button id="createObjectBtn" style="visibility: hidden; margin-left: 2em;">Create New <span id="createObjectTypeName"></span></button>
       <table id="resultsTable">
         <thead id="resultsHeader">
         </thead>

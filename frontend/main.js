@@ -5,6 +5,8 @@ const elemIds = [
     ... inputElemIds,
     'spaceId', 'startBtn', 'fetchGroupsBtn', 'fetchBrands', 'fetchPubTitles',
     'statusMsgLine', 'objectType',
+    'createObjectTypeName', 'createObjectBtn',
+    'createBtn', 'updateBtn',
     'clientIdSelect', 'spaceIdSelect', 'brandsSelect',
     'resultsTable', "resultsHeader", "resultsBody", 'copyTableBtn',
     'resultsPanel', 'editorPanel',
@@ -55,7 +57,6 @@ function showPanel(panelId) {
     }
 }
 
-
 function saveFormToUrlParams() {
     console.log('submitForm')
     let usp = new URLSearchParams()
@@ -87,6 +88,9 @@ function main() {
     formElems.clientIdSelect.addEventListener('input', onClientSelected)
     formElems.spaceIdSelect.addEventListener('input', onSpaceSelected)
     formElems.brandsSelect.addEventListener('input', onBrandSelected)
+    formElems.createObjectBtn.addEventListener('click', onCreateObjectClicked)
+    formElems.createBtn.addEventListener('click', onSaveNewObjectClicked)
+    formElems.updateBtn.addEventListener('click', onUpdateObjectClicked)
 
 }
 
@@ -247,6 +251,136 @@ async function onFetchPubTitlesClicked() {
     showResultsTable('PublicationTitle', respData.items)
 }
 
+async function onCreateObjectClicked() {
+    
+    const objectType = formElems.createObjectTypeName.innerText
+    const restPath = TypesConfig[objectType]?.restPath || null
+    const editableProps = TypesConfig[objectType]?.editableProps || null
+
+    if (!restPath) {
+        console.error(`No REST path defined for object type: ${objectType}`)
+        return
+    }
+    showPanel('editorPanel')
+
+    let objectData = {}
+    for (let p of editableProps) {
+        objectData[p] = ''
+    }
+
+    const jsonData = JSON.stringify(objectData, null, 2)
+
+    formElems.objectId.value = ''
+    formElems.editorText.value = jsonData
+}
+
+async function onSaveNewObjectClicked() {
+    const objectType = formElems.createObjectTypeName.innerText
+    const restPath = TypesConfig[objectType]?.restPath || null
+    const clientId = formElems.clientId.value
+
+    if (!restPath) {
+        console.error(`No REST path defined for object type: ${objectType}`)
+        return
+    }
+
+    let objectData = null
+    try {
+       objectData = JSON.parse(formElems.editorText.value)
+    }
+    catch (e) {
+        console.error('Invalid JSON data:', e)
+        statusMsg('Invalid JSON data. Please check the input.')
+        return
+    }
+
+    if (!objectData) {
+        console.error('No object data to save')
+        statusMsg('No object data to save. Please check the input.')
+        return
+    }
+
+    const usp = new URLSearchParams()
+
+    if (objectType === 'PublicationTitle') {
+        const brandId = formElems.brandsSelect.value
+        usp.set('brandId', brandId)
+    }
+
+    statusMsg(`Saving new ${objectType} ...`)
+
+    let url = `/rest/${clientId}/${restPath}/`
+
+    if (usp.toString())
+        url += '?' + usp.toString()
+
+    const fetchResp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(objectData)
+        })
+
+    const respData = await fetchResp.json()
+
+    console.log('Save Response', respData)
+
+    statusMsg(`Saved new ${objectType} ...`)
+}
+
+async function onUpdateObjectClicked() {
+    const objectId = formElems.objectId.value
+    const objectType = formElems.createObjectTypeName.innerText
+    const restPath = TypesConfig[objectType]?.restPath || null
+    const clientId = formElems.clientId.value
+
+    if (!objectId) {
+        console.error('No object ID provided for update')
+        statusMsg('No object ID provided for update. Please check the input.')
+        return
+    }
+
+    if (!restPath) {
+        console.error(`No REST path defined for object type: ${objectType}`)
+        return
+    }
+
+    let objectData = null
+    try {
+       objectData = JSON.parse(formElems.editorText.value)
+    }
+    catch (e) {
+        console.error('Invalid JSON data:', e)
+        statusMsg('Invalid JSON data. Please check the input.')
+        return
+    }
+
+    if (!objectData) {
+        console.error('No object data to save')
+        statusMsg('No object data to save. Please check the input.')
+        return
+    }
+
+    statusMsg(`Saving new ${objectType} ...`)
+
+    let url = `/rest/${clientId}/${restPath}/${objectId}`
+
+    const fetchResp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(objectData)
+        })
+
+    const respData = await fetchResp.json()
+
+    console.log('Save Response', respData)
+
+    statusMsg(`Saved new ${objectType} ...`)
+}
+
 function clrTable() {
     formElems.resultsHeader.innerHTML = ''
     formElems.resultsBody.innerHTML = ''
@@ -263,6 +397,15 @@ function showResultsTable(objectType, dataItems) {
 
     formElems.resultsHeader.appendChild( headerRow ( tableConfig.headerNames ) )
     formElems.copyTableBtn.style.visibility = 'visible'
+
+    console.log('showResultsTable', objectType, tableConfig)
+    if (tableConfig.editable) {
+        formElems.createObjectTypeName.innerHTML = objectType
+        formElems.createObjectBtn.style.visibility = 'visible'
+    }
+    else {
+        formElems.createObjectBtn.style.visibility = 'hidden'
+    }
 
     let i = 0
     for (let item of dataItems) {
@@ -405,10 +548,6 @@ function createRowElem(rowType, rowItem) {
 }
 
 const editObject = async (rowType, objectId) => {
-    const restPathMap = {
-        Brand: 'brands',
-        PublicationTitle: 'pub-titles',
-    }
     const restPath = TypesConfig[rowType]?.restPath || null
     const editableProps = TypesConfig[rowType]?.editableProps || null
     if (!restPath) {

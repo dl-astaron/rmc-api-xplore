@@ -52,9 +52,15 @@ class RmcApi {
     }
 
     async post(path, queryArgs) {
-        this.url = `/rest/${this.spaceId}/${path}`
+        this.url = this.baseUrl + path
 
         return await this.__call(this.url, 'POST', queryArgs)
+    }
+
+    async put(path, queryArgs) {
+        this.url = this.baseUrl + path
+
+        return await this.__call(this.url, 'PUT', queryArgs)
     }
 
     async patch(path, queryArgs) {

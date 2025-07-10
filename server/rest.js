@@ -8,9 +8,13 @@ restRouter.get('/:clientId/users/', userList );
 restRouter.get('/:clientId/users/:userId', userGet );
 restRouter.get('/:clientId/groups/', groupList );
 restRouter.get('/:clientId/brands/', brandList );
+restRouter.post('/:clientId/brands/', brandCreate );
 restRouter.get('/:clientId/brands/:objectId', brandGet );
+restRouter.post('/:clientId/brands/:objectId', brandUpdate );
 restRouter.get('/:clientId/pub-titles/', pubTitleList );
+restRouter.post('/:clientId/pub-titles/', pubTitleCreate );
 restRouter.get('/:clientId/pub-titles/:objectId', pubTitleGet );
+restRouter.post('/:clientId/pub-titles/:objectId', pubTitleUpdate );
 
 /*
     * Get list of users
@@ -118,6 +122,51 @@ async function brandGet(req, res, next) {
     await res.send( JSON.stringify( objectResp ));
 }
 
+/** 
+ * https://management-api.console.ringpublishing.com/ring-clients/{ringClientId}/brands
+ * 
+ * Create Brands
+ * 
+ * Eg: POST http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/brands/
+ */
+async function brandCreate(req, res, next) {
+
+    let ringClientId = req.params.clientId
+
+    let objectData = req.body
+    
+    let rmcApi = new RmcApi(ringClientId)
+
+    const objectResp = await rmcApi.post(`ring-clients/${ringClientId}/brands`, objectData)
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( objectResp ));
+}
+
+/** 
+ * https://management-api.console.ringpublishing.com/brands/{brandId}
+ * 
+ * Update Brands
+ * 
+ * Eg: POST http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/brands/...
+ */
+async function brandUpdate(req, res, next) {
+
+    let ringClientId = req.params.clientId
+    let objectId = req.params.objectId 
+
+    let objectData = req.body
+    
+    let rmcApi = new RmcApi(ringClientId)
+
+    const objectResp = await rmcApi.put(`brands/${objectId}`, objectData)
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( objectResp ));
+}
+
 /**
  * https://management-api.console.ringpublishing.com/brands/{brandId}/publishing-titles
  * 
@@ -154,6 +203,52 @@ async function pubTitleGet(req, res, next) {
     let rmcApi = new RmcApi(ringClientId)
 
     const objectResp = await rmcApi.get(`publishing-titles/${objectId}`, {  })
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( objectResp ));
+}
+
+/** 
+ * POST https://management-api.console.ringpublishing.com/brands/{brandId}/publishing-titles
+ * 
+ * Create Publishing Title
+ * 
+ * Eg: POST http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/publishing-titles/
+ */
+async function pubTitleCreate(req, res, next) {
+
+    let ringClientId = req.params.clientId
+    let brandId = req.query.brandId
+
+    let objectData = req.body
+    
+    let rmcApi = new RmcApi(ringClientId)
+
+    const objectResp = await rmcApi.post(`brands/${brandId}/publishing-titles`, objectData)
+
+    //console.log('done')
+
+    await res.send( JSON.stringify( objectResp ));
+}
+
+/** 
+ * PUT https://management-api.console.ringpublishing.com/publishing-titles/{publishingTitleId}
+ * 
+ * Update Publishing Title
+ * 
+ * Eg: POST http://localhost:4204/rest/e7f17ebe-51a8-4d6e-8dfe-7a92f627a428/publishing-titles/...
+ */
+async function pubTitleUpdate(req, res, next) {
+
+    let ringClientId = req.params.clientId
+    let objectId = req.params.objectId 
+
+    let objectData = req.body
+    
+    let rmcApi = new RmcApi(ringClientId)
+
+    const objectResp = await rmcApi.put(`publishing-titles/${objectId}`, objectData)
 
     //console.log('done')
 
