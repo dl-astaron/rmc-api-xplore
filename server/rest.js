@@ -16,6 +16,10 @@ restRouter.post('/:clientId/pub-titles/', pubTitleCreate );
 restRouter.get('/:clientId/pub-titles/:objectId', pubTitleGet );
 restRouter.post('/:clientId/pub-titles/:objectId', pubTitleUpdate );
 
+function now() {
+    return new Date().toISOString();
+}
+
 /*
     * Get list of users
 
@@ -93,7 +97,7 @@ async function brandList(req, res, next) {
     let rmcApi = new RmcApi(ringClientId)
 
 
-    const brands = await rmcApi.get(`ring-clients/${ringClientId}/brands`, {  })
+    const brands = await rmcApi.get(`ring-clients/${ringClientId}/brands?_anticache=${now()}`, {  })
 
     //console.log('done')
 
@@ -115,7 +119,7 @@ async function brandGet(req, res, next) {
     
     let rmcApi = new RmcApi(ringClientId)
 
-    const objectResp = await rmcApi.get(`brands/${objectId}`, {  })
+    const objectResp = await rmcApi.get(`brands/${objectId}?_anticache=${now()}`, {  })
 
     //console.log('done')
 
@@ -181,7 +185,7 @@ async function pubTitleList(req, res, next) {
 
     let rmcApi = new RmcApi(ringClientId)
 
-    const pubTitles = await rmcApi.get(`brands/${brandId}/publishing-titles`, {  })
+    const pubTitles = await rmcApi.get(`brands/${brandId}/publishing-titles?_anticache=${now()}`, {  })
 
     //console.log('done')
 
@@ -202,7 +206,7 @@ async function pubTitleGet(req, res, next) {
     
     let rmcApi = new RmcApi(ringClientId)
 
-    const objectResp = await rmcApi.get(`publishing-titles/${objectId}`, {  })
+    const objectResp = await rmcApi.get(`publishing-titles/${objectId}?_anticache=${now()}`, {  })
 
     //console.log('done')
 
