@@ -31,8 +31,10 @@ const TypesConfig = {
         restPath: 'brands',
     },
     PublicationTitle : {
-        headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator', 'Is Active'],
-        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author', 'isActive'],
+        headerNames: ['UUID', 'Name', 'Short Name', 'Description', 'cTime', 'mTime', 'Creator',
+            'Channel', 'Is Active', 'Accounting Id'],
+        rowProps: ['uuid', 'name', 'shortName', 'description', 'creationDate', 'modificationDate', 'author',
+            'publicationChannel', 'isActive', 'accountingIdentifier'],
         editableProps: ['name', 'shortName', 'description', 'publicationChannel', 'isActive', 'accountingIdentifier'],
         editable: true,
         restPath: 'pub-titles',
@@ -58,7 +60,7 @@ function showPanel(panelId) {
 }
 
 function saveFormToUrlParams() {
-    console.log('submitForm')
+    console.log('saveFormToUrlParams')
     let usp = new URLSearchParams()
 
     for (let e of inputElemIds) {
@@ -214,7 +216,7 @@ async function onFetchBrandsClicked() {
 
     statusMsg('Fetching groups DONE.')
 
-    console.log('Brands', brandsData)
+    //console.log('Brands', brandsData)
 
     showResultsTable('Brand', brandsData.items)
 
@@ -246,7 +248,7 @@ async function onFetchPubTitlesClicked() {
 
     statusMsg('Fetching pub titles DONE.')
 
-    console.log('Publ Titles', respData)
+    //console.log('Publ Titles', respData)
 
     showResultsTable('PublicationTitle', respData.items)
 }
@@ -261,12 +263,17 @@ async function onCreateObjectClicked() {
         console.error(`No REST path defined for object type: ${objectType}`)
         return
     }
+
+    formElems.updateBtn.disabled = true
+
     showPanel('editorPanel')
 
     let objectData = {}
     for (let p of editableProps) {
         objectData[p] = ''
     }
+
+    objectData['author'] = ''
 
     const jsonData = JSON.stringify(objectData, null, 2)
 
@@ -326,7 +333,16 @@ async function onSaveNewObjectClicked() {
 
     console.log('Save Response', respData)
 
+    if (!respData || !respData.uuid) {
+        statusMsg(`FAILED to Save new ${objectType} ...`)
+        return
+    }
+
+    formElems.objectId.value = respData.uuid
+    formElems.updateBtn.disabled = false
+
     statusMsg(`Saved new ${objectType} ...`)
+
 }
 
 async function onUpdateObjectClicked() {
@@ -362,7 +378,9 @@ async function onUpdateObjectClicked() {
         return
     }
 
-    statusMsg(`Saving new ${objectType} ...`)
+    const dispName = objectData.name || 'Unnamed Object'
+
+    statusMsg(`Updating ${objectType} "${dispName}" (${objectId})`)
 
     let url = `/rest/${clientId}/${restPath}/${objectId}`
 
@@ -376,9 +394,14 @@ async function onUpdateObjectClicked() {
 
     const respData = await fetchResp.json()
 
-    console.log('Save Response', respData)
+    console.log('Update Response', respData)
 
-    statusMsg(`Saved new ${objectType} ...`)
+    if (!respData || !respData.uuid) {
+        statusMsg(`FAILED to Update new ${objectType} "${dispName}" (${objectId}) ...`)
+        return
+    }
+
+    statusMsg(`Updated ${objectType} "${dispName}" (${objectId})`)
 }
 
 function clrTable() {
@@ -398,7 +421,7 @@ function showResultsTable(objectType, dataItems) {
     formElems.resultsHeader.appendChild( headerRow ( tableConfig.headerNames ) )
     formElems.copyTableBtn.style.visibility = 'visible'
 
-    console.log('showResultsTable', objectType, tableConfig)
+    //console.log('showResultsTable', objectType, tableConfig)
     if (tableConfig.editable) {
         formElems.createObjectTypeName.innerHTML = objectType
         formElems.createObjectBtn.style.visibility = 'visible'
@@ -559,10 +582,12 @@ const editObject = async (rowType, objectId) => {
 
     console.log(`Editing ${rowType} with ID: ${objectId}`)
 
-    showPanel('editorPanel')
-
     formElems.objectId.value = objectId
     formElems.objectType.innerText = rowType
+
+    formElems.updateBtn.disabled = objectId ? false : true
+
+    showPanel('editorPanel')
 
     statusMsg(`Fetching ${rowType} with ID: ${objectId}`)
 
